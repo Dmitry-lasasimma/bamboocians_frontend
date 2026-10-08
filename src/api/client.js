@@ -1,7 +1,8 @@
 import axios from 'axios';
 
+// In production REACT_APP_API_URL points at the Render backend; in dev the CRA proxy handles /api
 const client = axios.create({
-  baseURL: '/api',
+  baseURL: `${process.env.REACT_APP_API_URL || ''}/api`,
   headers: { 'Content-Type': 'application/json' },
 });
 
