@@ -13,11 +13,13 @@ client.interceptors.request.use((config) => {
   return config;
 });
 
-// On 401, clear token and redirect to login
+// On 401, clear token and redirect to login.
+// Login/register failures are left to the form so it can show the error.
 client.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401) {
+    const isAuthForm = /\/auth\/(login|register)$/.test(err.config?.url || '');
+    if (err.response?.status === 401 && !isAuthForm) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       window.location.href = '/login';

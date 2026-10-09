@@ -19,6 +19,20 @@ export default function OrganizerBookings() {
     load();
   };
 
+  const createContract = async (b) => {
+    const content = window.prompt(
+      `Contract terms for "${b.event?.title}" with ${b.booked_to?.name}:`,
+      `${b.booked_to?.name} agrees to provide ${b.booking_type} services for "${b.event?.title}" on ${new Date(b.date).toLocaleDateString()} for $${b.price}.`
+    );
+    if (!content) return;
+    try {
+      await client.post('/organizer/contracts', { booking_id: b.id, content });
+      alert('Contract created. It is now waiting for the other party to sign.');
+    } catch (err) {
+      alert(err.response?.data?.error || 'Failed to create contract');
+    }
+  };
+
   return (
     <Layout>
       <div style={{ marginBottom: 28 }}>
@@ -51,6 +65,9 @@ export default function OrganizerBookings() {
                         {b.status === 'pending' && (
                           <button onClick={() => cancel(b.id)} style={styles.cancelBtn}>Cancel</button>
                         )}
+                        {b.status === 'confirmed' && (
+                          <button onClick={() => createContract(b)} style={styles.contractBtn}>Create Contract</button>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -69,6 +86,10 @@ const styles = {
   td: { padding: '14px 0', fontSize: 14, color: '#333', borderBottom: '1px solid #f5f5f5', paddingRight: 16 },
   cancelBtn: {
     background: '#fee', color: '#c0392b', border: '1px solid #fcc',
+    borderRadius: 6, padding: '4px 12px', fontSize: 12, cursor: 'pointer',
+  },
+  contractBtn: {
+    background: '#e8f5ee', color: '#2d6a4f', border: '1px solid #b7e4c7',
     borderRadius: 6, padding: '4px 12px', fontSize: 12, cursor: 'pointer',
   },
 };
